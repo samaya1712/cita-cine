@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Invitación al cine 🍿</title>
+
   <style>
     :root{
       --bg1:#0f1226;
@@ -32,9 +33,7 @@
       overflow:hidden;
     }
 
-    .wrap{
-      width: min(520px, 100%);
-    }
+    .wrap{ width: min(520px, 100%); }
 
     .card{
       background: var(--card);
@@ -82,11 +81,17 @@
       touch-action: manipulation;
       user-select: none;
     }
-
     button:active{ transform: scale(.98); }
 
     .btn-yes{ background: var(--yes); color: #07210f; }
     .btn-no{ background: var(--no); color: #2a0505; }
+
+    /* Para que el botón SI pueda crecer de forma gradual */
+    #yesBtn{
+      width: var(--yesW, 160px);
+      height: var(--yesH, 52px);
+      font-size: var(--yesF, 18px);
+    }
 
     /* Sección películas */
     .movies{
@@ -96,23 +101,52 @@
       margin-top: 10px;
     }
 
-    .movie-btn{
+    .movie-card{
+      display:flex;
+      gap: 12px;
+      align-items:center;
       width: 100%;
-      min-width: unset;
+      padding: 12px;
       border-radius: 18px;
-      padding: 16px 16px;
-      font-size: 18px;
       background: rgba(255,255,255,.10);
-      color: var(--text);
       border: 1px solid rgba(255,255,255,.14);
       box-shadow: 0 14px 28px rgba(0,0,0,.22);
+      cursor:pointer;
+      transition: transform .15s ease;
+      user-select:none;
+    }
+    .movie-card:active{ transform: scale(.99); }
+
+    .poster{
+      width: 74px;
+      height: 110px;
+      border-radius: 12px;
+      object-fit: cover;
+      flex: 0 0 auto;
+      border: 1px solid rgba(255,255,255,.15);
+      background: rgba(0,0,0,.25);
     }
 
-    .movie-btn:hover{ transform: translateY(-1px); }
+    .movie-info{
+      text-align:left;
+      flex: 1 1 auto;
+    }
+    .movie-title{
+      margin:0;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing:.2px;
+    }
+    .movie-hint{
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
 
-    .final{
+    /* Pantalla final */
+    .final-box{
       margin-top: 14px;
-      padding: 14px 14px;
+      padding: 16px 16px;
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(34,197,94,.14);
@@ -138,20 +172,14 @@
     }
 
     .hidden{ display:none !important; }
-
-    /* Para que el botón SI pueda crecer de forma gradual */
-    #yesBtn{
-      width: var(--yesW, 160px);
-      height: var(--yesH, 52px);
-      font-size: var(--yesF, 18px);
-    }
   </style>
 </head>
+
 <body>
   <main class="wrap">
+    <!-- Paso 1 -->
     <section class="card" id="step1">
       <h1 class="title">¿Quieres ir al cine conmigo? 🍿</h1>
-      <p class="subtitle">Elige con sinceridad… (pero el “NO” tiene consecuencias 😈)</p>
 
       <div class="row" id="buttonsRow">
         <button class="btn-yes" id="yesBtn" type="button">SI</button>
@@ -159,33 +187,69 @@
       </div>
     </section>
 
+    <!-- Paso 2 -->
     <section class="card hidden" id="step2">
-      <h2 class="title">¡Bien! 😍 ¿Cuál peli escogemos?</h2>
-      <p class="subtitle">Toca una opción:</p>
+      <h2 class="title">¡Bien! 😍</h2>
+      <p class="subtitle"><strong>Escoge una pelicula:</strong></p>
 
       <div class="movies">
-        <button class="movie-btn" type="button" data-movie="Rio">🎬 Rio</button>
-        <button class="movie-btn" type="button" data-movie="Goat">🎬 Goat</button>
-        <button class="movie-btn" type="button" data-movie="El niño y la garza">🎬 El niño y la garza</button>
-      </div>
+        <div class="movie-card" role="button" tabindex="0" data-movie="Rio">
+          <img class="poster" alt="Portada Rio" referrerpolicy="no-referrer"
+               src="https://es.web.img3.acsta.net/medias/nmedia/18/82/78/80/19696270.jpg">
+          <div class="movie-info">
+            <p class="movie-title">Rio</p>
+            <p class="movie-hint">Toca para escoger</p>
+          </div>
+        </div>
 
-      <div class="final hidden" id="finalMsg"></div>
+        <div class="movie-card" role="button" tabindex="0" data-movie="Goat">
+          <img class="poster" alt="Portada GOAT" referrerpolicy="no-referrer"
+               src="https://score.procinal.com.co/mobilecomjson/imagenes/1618.jpg">
+          <div class="movie-info">
+            <p class="movie-title">Goat</p>
+            <p class="movie-hint">Toca para escoger</p>
+          </div>
+        </div>
+
+        <div class="movie-card" role="button" tabindex="0" data-movie="El niño y la garza">
+          <img class="poster" alt="Portada El niño y la garza" referrerpolicy="no-referrer"
+               src="https://static.wikia.nocookie.net/doblaje/images/5/5f/El_ni%C3%B1o_y_la_garza.jpg/revision/latest?cb=20231218203634&path-prefix=es">
+          <div class="movie-info">
+            <p class="movie-title">El niño y la garza</p>
+            <p class="movie-hint">Toca para escoger</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Paso 3: pantalla final (NO debajo de la opción; es otra “vista”) -->
+    <section class="card hidden" id="step3">
+      <h2 class="title">¡Perfecto! 💚</h2>
+      <div class="final-box" id="finalMsg"></div>
+
+      <div class="row" style="margin-top:14px;">
+        <button type="button" class="btn-yes" id="backBtn" style="min-width:220px;">
+          Volver a ver las pelis
+        </button>
+      </div>
     </section>
   </main>
 
   <script>
     const step1 = document.getElementById("step1");
     const step2 = document.getElementById("step2");
+    const step3 = document.getElementById("step3");
+
     const yesBtn = document.getElementById("yesBtn");
     const noBtn  = document.getElementById("noBtn");
     const finalMsg = document.getElementById("finalMsg");
+    const backBtn = document.getElementById("backBtn");
 
     // Tamaño inicial del botón SI (en px) y crecimiento por cada NO
     let yesW = 160;
     let yesH = 52;
     let yesF = 18;
 
-    // Cada NO lo infla bastante para que rápido domine la pantalla
     const growW = 80;
     const growH = 28;
     const growF = 4;
@@ -197,19 +261,24 @@
     }
     applyYesSize();
 
-    function goToMovies() {
+    function showStep(n){
       step1.classList.add("hidden");
-      step2.classList.remove("hidden");
-      // Por si quedó modo full screen
-      yesBtn.classList.remove("fullscreen-yes");
+      step2.classList.add("hidden");
+      step3.classList.add("hidden");
+
+      if(n === 1) step1.classList.remove("hidden");
+      if(n === 2) step2.classList.remove("hidden");
+      if(n === 3) step3.classList.remove("hidden");
     }
 
-    // Si toca SI -> mostrar películas
+    // SI -> ir a elegir película
     yesBtn.addEventListener("click", () => {
-      goToMovies();
+      // Por si quedó en modo full-screen
+      yesBtn.classList.remove("fullscreen-yes");
+      showStep(2);
     });
 
-    // Si toca NO -> SI crece hasta ocupar toda la pantalla
+    // NO -> SI crece hasta ocupar toda la pantalla
     noBtn.addEventListener("click", () => {
       yesW += growW;
       yesH += growH;
@@ -217,33 +286,38 @@
 
       applyYesSize();
 
-      // Si el botón SI ya es suficientemente grande, lo ponemos full-screen
       const vw = window.innerWidth;
       const vh = window.innerHeight;
 
-      // Cuando supere ~85% del ancho o ~70% del alto, lo hacemos pantalla completa
       if (yesW >= vw * 0.85 || yesH >= vh * 0.70) {
         yesBtn.classList.add("fullscreen-yes");
         noBtn.classList.add("hidden");
-        // Opcional: cambiar el texto para rematar
         yesBtn.textContent = "SÍÍÍ 💚";
       }
     });
 
-    // Selección de película -> mostrar mensaje final
-    document.querySelectorAll("[data-movie]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const movie = btn.dataset.movie;
-        finalMsg.classList.remove("hidden");
-        finalMsg.textContent =
-          `Excelente opción (${movie}). Quedamos el sábado 28 de Febrero a las 7:00 P.M. para verla, ¡no faltes! ✨`;
+    // Click / Enter sobre película -> pasar a pantalla final
+    function pickMovie(movie){
+      finalMsg.textContent =
+        `Excelente opción (${movie}), quedamos el sábado 28 de Febrero a las 7:00 P.M. para verla, ¡no faltes! ✨`;
+      showStep(3);
+    }
+
+    document.querySelectorAll(".movie-card").forEach(card => {
+      card.addEventListener("click", () => pickMovie(card.dataset.movie));
+      card.addEventListener("keydown", (e) => {
+        if(e.key === "Enter" || e.key === " ") pickMovie(card.dataset.movie);
       });
+    });
+
+    // Botón volver
+    backBtn.addEventListener("click", () => {
+      showStep(2);
     });
 
     // Si cambia orientación/tamaño, mantenemos coherencia del full-screen
     window.addEventListener("resize", () => {
       if (yesBtn.classList.contains("fullscreen-yes")) {
-        // Asegura pantalla completa
         yesBtn.style.width = "100vw";
         yesBtn.style.height = "100vh";
       }
