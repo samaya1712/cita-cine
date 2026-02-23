@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Invitación al cine 🍿</title>
+  <style>
+    :root{
+      --bg1:#0f1226;
+      --bg2:#1b1f3a;
+      --card: rgba(255,255,255,.08);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --yes:#22c55e;
+      --no:#ef4444;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 22px;
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 50% 20%, rgba(255,255,255,.10), transparent 55%),
+                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      overflow:hidden;
+    }
+
+    .wrap{
+      width: min(520px, 100%);
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 22px;
+      backdrop-filter: blur(10px);
+    }
+
+    .title{
+      font-size: clamp(22px, 5vw, 30px);
+      line-height: 1.15;
+      margin: 0 0 10px;
+      text-align:center;
+      letter-spacing:.2px;
+    }
+
+    .subtitle{
+      margin: 0 0 18px;
+      text-align:center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .row{
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+
+    button{
+      appearance:none;
+      border:0;
+      cursor:pointer;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-weight: 800;
+      font-size: 18px;
+      min-width: 140px;
+      box-shadow: 0 12px 25px rgba(0,0,0,.25);
+      transition: transform .18s ease, width .18s ease, height .18s ease, font-size .18s ease, opacity .18s ease;
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    button:active{ transform: scale(.98); }
+
+    .btn-yes{ background: var(--yes); color: #07210f; }
+    .btn-no{ background: var(--no); color: #2a0505; }
+
+    /* Sección películas */
+    .movies{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .movie-btn{
+      width: 100%;
+      min-width: unset;
+      border-radius: 18px;
+      padding: 16px 16px;
+      font-size: 18px;
+      background: rgba(255,255,255,.10);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 14px 28px rgba(0,0,0,.22);
+    }
+
+    .movie-btn:hover{ transform: translateY(-1px); }
+
+    .final{
+      margin-top: 14px;
+      padding: 14px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(34,197,94,.14);
+      color: rgba(255,255,255,.95);
+      font-size: 16px;
+      line-height: 1.35;
+      text-align:center;
+    }
+
+    /* Modo “SI ocupa toda la pantalla” */
+    .fullscreen-yes{
+      position: fixed;
+      inset: 0;
+      width: 100vw !important;
+      height: 100vh !important;
+      border-radius: 0 !important;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: clamp(26px, 8vw, 46px) !important;
+      letter-spacing: .5px;
+      z-index: 9999;
+    }
+
+    .hidden{ display:none !important; }
+
+    /* Para que el botón SI pueda crecer de forma gradual */
+    #yesBtn{
+      width: var(--yesW, 160px);
+      height: var(--yesH, 52px);
+      font-size: var(--yesF, 18px);
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card" id="step1">
+      <h1 class="title">¿Quieres ir al cine conmigo? 🍿</h1>
+      <p class="subtitle">Elige con sinceridad… (pero el “NO” tiene consecuencias 😈)</p>
+
+      <div class="row" id="buttonsRow">
+        <button class="btn-yes" id="yesBtn" type="button">SI</button>
+        <button class="btn-no" id="noBtn" type="button">NO</button>
+      </div>
+    </section>
+
+    <section class="card hidden" id="step2">
+      <h2 class="title">¡Bien! 😍 ¿Cuál peli escogemos?</h2>
+      <p class="subtitle">Toca una opción:</p>
+
+      <div class="movies">
+        <button class="movie-btn" type="button" data-movie="Rio">🎬 Rio</button>
+        <button class="movie-btn" type="button" data-movie="Goat">🎬 Goat</button>
+        <button class="movie-btn" type="button" data-movie="El niño y la garza">🎬 El niño y la garza</button>
+      </div>
+
+      <div class="final hidden" id="finalMsg"></div>
+    </section>
+  </main>
+
+  <script>
+    const step1 = document.getElementById("step1");
+    const step2 = document.getElementById("step2");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
+    const finalMsg = document.getElementById("finalMsg");
+
+    // Tamaño inicial del botón SI (en px) y crecimiento por cada NO
+    let yesW = 160;
+    let yesH = 52;
+    let yesF = 18;
+
+    // Cada NO lo infla bastante para que rápido domine la pantalla
+    const growW = 80;
+    const growH = 28;
+    const growF = 4;
+
+    function applyYesSize() {
+      yesBtn.style.setProperty("--yesW", yesW + "px");
+      yesBtn.style.setProperty("--yesH", yesH + "px");
+      yesBtn.style.setProperty("--yesF", yesF + "px");
+    }
+    applyYesSize();
+
+    function goToMovies() {
+      step1.classList.add("hidden");
+      step2.classList.remove("hidden");
+      // Por si quedó modo full screen
+      yesBtn.classList.remove("fullscreen-yes");
+    }
+
+    // Si toca SI -> mostrar películas
+    yesBtn.addEventListener("click", () => {
+      goToMovies();
+    });
+
+    // Si toca NO -> SI crece hasta ocupar toda la pantalla
+    noBtn.addEventListener("click", () => {
+      yesW += growW;
+      yesH += growH;
+      yesF += growF;
+
+      applyYesSize();
+
+      // Si el botón SI ya es suficientemente grande, lo ponemos full-screen
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // Cuando supere ~85% del ancho o ~70% del alto, lo hacemos pantalla completa
+      if (yesW >= vw * 0.85 || yesH >= vh * 0.70) {
+        yesBtn.classList.add("fullscreen-yes");
+        noBtn.classList.add("hidden");
+        // Opcional: cambiar el texto para rematar
+        yesBtn.textContent = "SÍÍÍ 💚";
+      }
+    });
+
+    // Selección de película -> mostrar mensaje final
+    document.querySelectorAll("[data-movie]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const movie = btn.dataset.movie;
+        finalMsg.classList.remove("hidden");
+        finalMsg.textContent =
+          `Excelente opción (${movie}). Quedamos el sábado 28 de Febrero a las 7:00 P.M. para verla, ¡no faltes! ✨`;
+      });
+    });
+
+    // Si cambia orientación/tamaño, mantenemos coherencia del full-screen
+    window.addEventListener("resize", () => {
+      if (yesBtn.classList.contains("fullscreen-yes")) {
+        // Asegura pantalla completa
+        yesBtn.style.width = "100vw";
+        yesBtn.style.height = "100vh";
+      }
+    });
+  </script>
+</body>
+</html>
